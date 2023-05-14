@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import 'dart:math';
 import 'dart:io';
 
 void main() {
@@ -71,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       label: Text('Home'),
                     ),
                     NavigationRailDestination(
-                      icon: Icon(Icons.favorite),
+                      icon: Icon(Icons.camera_alt),
                       label: Text('Selfies'),
                     ),
                   ],
@@ -136,16 +138,10 @@ class _UserProfileState extends State<UserProfile> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  saveToFile([["username", name]]);
+                  saveToFile([["username", name], ["uuid", Uuid().v4()]]);
                 },
-                icon: Icon( Icons.favorite_border_outlined),
-                label: Text('Like'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                },
-                child: Text('Next'),
+                icon: Icon( Icons.check_circle),
+                label: Text('Correcto'),
               ),
             ],
           ),
@@ -162,6 +158,14 @@ class TakePic extends StatefulWidget {
 
 class _TakePicState extends State<TakePic> {
   var image = Image.asset('assets/base_avatar.jpg');
+  var happy = Image.asset('assets/fred_expressions/happy.png');
+  var sad = Image.asset('assets/fred_expressions/sad.png');
+  var angry = Image.asset('assets/fred_expressions/angry.png');
+  var surprised = Image.asset('assets/fred_expressions/surprised.png');
+  var neutral = Image.asset('assets/fred_expressions/neutral.png');
+
+  List<String> emotions = ["feliz", "triste", "enojado", "sorprendido", "neutral"];
+  final _random = Random();
   /*Future<File> saveImage(File image) async {
     final directory = await getApplicationDocumentsDirectory();
     final File rawImage = await image.copy('${directory.path}/image1.png');
@@ -172,16 +176,53 @@ class _TakePicState extends State<TakePic> {
     ImagePicker picker = ImagePicker();
     XFile? file;
     if (source == "camera") {
-      file = await picker.pickImage(source: ImageSource.camera);
+      file = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 25,
+        preferredCameraDevice: CameraDevice.rear);
     } else {
       file = await picker.pickImage(source: ImageSource.gallery);
     }
     if (file == null) return;
     File rawImage = File(file.path);
     await ipfsUpload(rawImage.path);
-    setState(() {
+    /*setState(() {
       image = Image.file(rawImage);
-    });
+    });*/
+  }
+
+  String switchExpression() {
+    var emotion = emotions[_random.nextInt(emotions.length)];
+    switch (emotion) {
+      case "feliz":
+        setState(() {
+          image = happy;
+        });
+        break;
+      case "triste":
+        setState(() {
+          image = sad;
+        });
+        break;
+      case "enojado":
+        setState(() {
+          image = angry;
+        });
+        break;
+      case "sorprendido":
+        setState(() {
+          image = surprised;
+        });
+        break;
+      case "neutral":
+        setState(() {
+          image = neutral;
+        });
+        break;
+      default:
+        throw UnimplementedError('no widget for $emotion');
+    }
+    return emotion;
   }
   @override
   Widget build(BuildContext context) {
@@ -195,6 +236,16 @@ class _TakePicState extends State<TakePic> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
+                margin: EdgeInsets.all(20),
+                child: TextField(
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Fred está ${switchExpression()}...\n...intenta imitarlo',
+                  ),
+                ),
+              ),
+              Container(
                 margin: EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -205,18 +256,24 @@ class _TakePicState extends State<TakePic> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
-                  child: Image(image: image.image, width: 350, height: 400, fit: BoxFit.fill)),
+                  child: Image(image: image.image, width: 350, height: 300, fit: BoxFit.fill)),
               ),
               SizedBox(height: 10),
               ElevatedButton.icon(
-                onPressed: () => imageUpload("camera"),
+                onPressed: () => {
+                  imageUpload("camera"),
+                  switchExpression(),
+                },
                 label: Text('Tomar Foto'),
                 icon: Icon(Icons.camera_alt),
               ),
               SizedBox(height: 10),
               SizedBox(width: 10),
               ElevatedButton.icon(
-                onPressed: () => imageUpload("gallery"),
+                onPressed: () => {
+                  imageUpload("gallery"),
+                  switchExpression(),
+                },
                 label: Text(' Subir Foto '),
                 icon: Icon(Icons.upload),
               ),
@@ -286,28 +343,37 @@ void saveToFile(List<List<String>> content) async {
   for (var i = 0; i < content.length; i++) {
     await writer.setString(content[i][0], content[i][1]);
   }
-  final checking = writer.getString('username');
+  final checking = writer.getString('uuid');
   print(checking);
 }
 
-/*Future<void> ipfsUpload(File file) async {
-  try {
-    var auth = base64Encode(utf8.encode('2KiK6S75slDQfxRFU5dfP7z7TQG:622237ae0de6536fe6464071ffa0a100'));
-    IpfsClient ipfsClient = IpfsClient(url: "https://ipfs.infura.io:5001", authorizationToken: auth);
-  var res = await ipfsClient.write(
-      dir: '',
-      filePath: file.path,
-      fileName: "Simulator.png");
-  print("++++++++++++++++++++++++++++");
-  print(res);
-  } catch (e) {
-    print(e);
+class ClassifiedImage {
+  late String cid;
+  late String emotion;
+  late String sourceUuid;
+  
+
+  ClassifiedImage(
+     this.cid,
+     this.emotion,
+    this.sourceUuid,
+  
+  );
+
+  ClassifiedImage.fromJson(Map<String, dynamic> json) {
+    cid = json['cid'];
+    emotion = json['emotion'];
+    sourceUuid = json['sourceUuid'];
+    
   }
-  var res1 = await ipfsClient.write(
-      dir: 'testpath3/Simulator.png',
-      filePath: "[FILE_PATH]/Simulator.png",
-      fileName: "Simulator.png");
-  print(res1);
-  var res2 = await ipfsClient.ls(dir: "testDir");
-  print(res2);
-}*/
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['cid'] = cid;
+    data['emotion'] = emotion;
+    data['sourceUuid'] = sourceUuid;
+    
+    return data;
+  }
+  
+}
