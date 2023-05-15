@@ -147,7 +147,7 @@ class _UserProfileState extends State<UserProfile> {
               ElevatedButton.icon(
                 onPressed: () {
                   //savePair([["username", username], ["uuid", Uuid().v4()]]);
-                  widget.fileHandler.writeToFile(username);
+                  widget.fileHandler.writeToFile(username, "profile");
                   globals.username = username;
                 },
                 icon: Icon( Icons.check_circle),
@@ -176,6 +176,7 @@ class _TakePicState extends State<TakePic> {
 
   List<String> emotions = ["feliz", "triste", "enojado", "sorprendido", "neutral"];
   final _random = Random();
+  var response = {};
   /*Future<File> saveImage(File image) async {
     final directory = await getApplicationDocumentsDirectory();
     final File rawImage = await image.copy('${directory.path}/image1.png');
@@ -188,17 +189,20 @@ class _TakePicState extends State<TakePic> {
     if (source == "camera") {
       file = await picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: 25,
+        imageQuality: 10,
         preferredCameraDevice: CameraDevice.rear);
     } else {
-      file = await picker.pickImage(source: ImageSource.gallery);
+      file = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 10,
+        );
     }
     if (file == null) return;
-    File rawImage = File(file.path);
-    await ipfsUpload(rawImage.path);
+    await ipfsUpload(file.path);
     /*setState(() {
       image = Image.file(rawImage);
     });*/
+    
   }
 
   String switchExpression() {
@@ -251,7 +255,7 @@ class _TakePicState extends State<TakePic> {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Fred está ${switchExpression()}...\n...intenta imitarlo',
+                    labelText: 'Fred está ${switchExpression()}...\n...intenta imitarlo \n ${globals.response}',
                   ),
                 ),
               ),
@@ -341,6 +345,7 @@ Future<void> ipfsUpload(String filePath) async {
   if (response.statusCode == 200) {
     // File uploaded successfully
     var responseBody = await response.stream.bytesToString();
+    globals.response = responseBody;
     print('IPFS Response: $responseBody');
   } else {
     // Handle error
