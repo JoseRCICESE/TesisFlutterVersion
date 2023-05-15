@@ -1,14 +1,17 @@
+import 'package:TRHEAD/storage.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-//import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math';
 import 'dart:io';
+
+import 'globals.dart' as globals;
+//import 'classified_image.dart' as classified_image;
 
 void main() {
   runApp(MyApp());
@@ -27,7 +30,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 23, 245, 89)),
         ),
-        home: MyHomePage(),
+        home: RouteSplash(fileHandler: FileStorage()),
       ),
     );
   }
@@ -40,6 +43,9 @@ class MyAppState extends ChangeNotifier {
 // ...
 
 class MyHomePage extends StatefulWidget {
+   const MyHomePage({super.key, required this.fileHandler});
+
+  final FileStorage fileHandler;
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -51,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
       switch (selectedIndex) {
         case 0:
-          page = UserProfile();
+          page = UserProfile(fileHandler: FileStorage());
           break;
         case 1:
           page = TakePic();
@@ -101,12 +107,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 class UserProfile extends StatefulWidget {
+  const UserProfile({super.key, required this.fileHandler});
+
+  final FileStorage fileHandler;
   @override
   State<UserProfile> createState() => _UserProfileState();
 }
 
 class _UserProfileState extends State<UserProfile> {
-  String name = Platform.operatingSystem;
+  String username = globals.username;
 
   @override
   Widget build(BuildContext context) {
@@ -118,11 +127,10 @@ class _UserProfileState extends State<UserProfile> {
           Container(
             margin: EdgeInsets.all(25),
             child: TextFormField(
-              initialValue: name,
+              initialValue: username,
               onChanged: (value) {
                 setState(() {
-                  name = value;
-                  print(name);
+                  username = value;
                 });
               },
               decoration: const InputDecoration(
@@ -138,7 +146,9 @@ class _UserProfileState extends State<UserProfile> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  saveToFile([["username", name], ["uuid", Uuid().v4()]]);
+                  //savePair([["username", username], ["uuid", Uuid().v4()]]);
+                  widget.fileHandler.writeToFile(username);
+                  globals.username = username;
                 },
                 icon: Icon( Icons.check_circle),
                 label: Text('Correcto'),
@@ -338,7 +348,7 @@ Future<void> ipfsUpload(String filePath) async {
   }
 }
 
-void saveToFile(List<List<String>> content) async {
+void savePair(List<List<String>> content) async {
   final writer = await SharedPreferences.getInstance();
   for (var i = 0; i < content.length; i++) {
     await writer.setString(content[i][0], content[i][1]);
@@ -347,33 +357,62 @@ void saveToFile(List<List<String>> content) async {
   print(checking);
 }
 
-class ClassifiedImage {
-  late String cid;
-  late String emotion;
-  late String sourceUuid;
-  
+void readPair(key) async {
+  try {
+  final reader = await SharedPreferences.getInstance();
+  globals.username = reader.getString('username') as String;
+  print(reader.getString('uuid'));
+  } catch (e) {
+    print(e);
+  }
+}
 
-  ClassifiedImage(
-     this.cid,
-     this.emotion,
-    this.sourceUuid,
-  
-  );
+class RouteSplash extends StatefulWidget {
+    const RouteSplash({super.key, required this.fileHandler});
+    final FileStorage fileHandler;
+  @override
+  _RouteSplashState createState() => _RouteSplashState();
+}
 
-  ClassifiedImage.fromJson(Map<String, dynamic> json) {
-    cid = json['cid'];
-    emotion = json['emotion'];
-    sourceUuid = json['sourceUuid'];
-    
+class _RouteSplashState extends State<RouteSplash> {
+  bool shouldProceed = false;
+
+  _fetchPrefs() async {
+    await Future.delayed(Duration(seconds: 1));// dummy code showing the wait period while getting the preferences
+    setState(() {
+      shouldProceed = true;//got the prefs; set to some value if needed
+    });
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['cid'] = cid;
-    data['emotion'] = emotion;
-    data['sourceUuid'] = sourceUuid;
-    
-    return data;
+  @override
+  void initState() {
+    super.initState();
+    _fetchPrefs();//running initialisation code; getting prefs etc.
+    widget.fileHandler.readFromFile().then((value) {
+          setState(() {
+              globals.username = value;
+              print(globals.username);
+            });
+          });
   }
-  
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: shouldProceed
+            ? ElevatedButton(
+                onPressed: () {
+                  //move to next screen and pass the prefs if you want
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyHomePage(fileHandler: FileStorage(),)),
+                  );
+                },
+                child: Text("Continue"),
+              )
+            : CircularProgressIndicator(),//show splash screen here instead of progress indicator
+      ),
+    );
+  }
 }
