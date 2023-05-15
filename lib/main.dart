@@ -1,4 +1,5 @@
 import 'package:TRHEAD/storage.dart';
+import 'package:TRHEAD/classified_image.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math';
-import 'dart:io';
 
 import 'globals.dart' as globals;
 //import 'classified_image.dart' as classified_image;
@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
           page = UserProfile(fileHandler: FileStorage());
           break;
         case 1:
-          page = TakePic();
+          page = TakePic(fileHandler: FileStorage(), imageHandler: ClassifiedImage("", ));
           break;
         default:
           throw UnimplementedError('no widget for $selectedIndex');
@@ -147,7 +147,7 @@ class _UserProfileState extends State<UserProfile> {
               ElevatedButton.icon(
                 onPressed: () {
                   //savePair([["username", username], ["uuid", Uuid().v4()]]);
-                  widget.fileHandler.writeToFile(username, "profile");
+                  widget.fileHandler.writeToFile(username, "profile", false);
                   globals.username = username;
                 },
                 icon: Icon( Icons.check_circle),
@@ -162,6 +162,9 @@ class _UserProfileState extends State<UserProfile> {
 }
 
 class TakePic extends StatefulWidget {
+  const TakePic({super.key, required this.fileHandler, required ClassifiedImage imageHandler});
+
+  final FileStorage fileHandler;
   @override
   State<TakePic> createState() => _TakePicState();
 }
@@ -199,10 +202,12 @@ class _TakePicState extends State<TakePic> {
     }
     if (file == null) return;
     await ipfsUpload(file.path);
+
+    widget.fileHandler.writeToFile(globals, "profile", false);
     /*setState(() {
       image = Image.file(rawImage);
     });*/
-    
+
   }
 
   String switchExpression() {

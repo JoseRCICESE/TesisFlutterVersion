@@ -1,19 +1,21 @@
 library classsified_image;
 
-import 'dart:io';
-
-import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
 
 class ClassifiedImage {
   late String cid;
   late String emotion;
   late String sourceUuid;
+  late String name;
+  late String size;
   
 
   ClassifiedImage(
-     this.cid,
-     this.emotion,
+    this.cid,
+    this.emotion,
     this.sourceUuid,
+    this.name,
+    this.size,
   
   );
 
@@ -21,6 +23,8 @@ class ClassifiedImage {
     cid = json['cid'];
     emotion = json['emotion'];
     sourceUuid = json['sourceUuid'];
+    name = json['Name'];
+    size = json['Size'];
     
   }
 
@@ -29,41 +33,14 @@ class ClassifiedImage {
     data['cid'] = cid;
     data['emotion'] = emotion;
     data['sourceUuid'] = sourceUuid;
+    data['name'] = name;
     
     return data;
+  } 
+
+  List<ClassifiedImage> parseResponse(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<ClassifiedImage>((json) => ClassifiedImage.fromJson(json)).toList();
   }
-
-  Future<String> get _localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-  return directory.path;
-}
-
-Future<File> get _localFile async {
-  final path = await _localPath;
-  print('${path}get local file');
-  return File('$path/classifiedImages.txt');
-}
-
-Future<File> writeToFile(String classif) async {
-  final file = await _localFile;
-  print('${file.path}write to file');
-
-  // Write the file
-  return file.writeAsString(classif);
-}
-
-Future<int> readFromFile() async {
-  try {
-    final file = await _localFile;
-
-    // Read the file
-    final contents = await file.readAsString();
-
-    return int.parse(contents);
-  } catch (e) {
-    // If encountering an error, return 0
-    return 0;
-  }
-}
-  
 }
