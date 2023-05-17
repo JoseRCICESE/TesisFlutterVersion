@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
           page = UserProfile(fileHandler: FileStorage());
           break;
         case 1:
-          page = TakePic(fileHandler: FileStorage(), imageHandler: ClassifiedImage("", ));
+          page = TakePic(fileHandler: FileStorage());
           break;
         default:
           throw UnimplementedError('no widget for $selectedIndex');
@@ -146,7 +146,6 @@ class _UserProfileState extends State<UserProfile> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  //savePair([["username", username], ["uuid", Uuid().v4()]]);
                   widget.fileHandler.writeToFile(username, "profile", false);
                   globals.username = username;
                 },
@@ -162,7 +161,7 @@ class _UserProfileState extends State<UserProfile> {
 }
 
 class TakePic extends StatefulWidget {
-  const TakePic({super.key, required this.fileHandler, required ClassifiedImage imageHandler});
+  const TakePic({super.key, required this.fileHandler});
 
   final FileStorage fileHandler;
   @override
@@ -179,13 +178,9 @@ class _TakePicState extends State<TakePic> {
 
   List<String> emotions = ["feliz", "triste", "enojado", "sorprendido", "neutral"];
   final _random = Random();
+  String emotion = "";
   var response = {};
-  /*Future<File> saveImage(File image) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final File rawImage = await image.copy('${directory.path}/image1.png');
-    print(rawImage.path);
-    return rawImage;
-  }*/
+
   Future<void> imageUpload(source) async {
     ImagePicker picker = ImagePicker();
     XFile? file;
@@ -202,8 +197,14 @@ class _TakePicState extends State<TakePic> {
     }
     if (file == null) return;
     await ipfsUpload(file.path);
-
-    widget.fileHandler.writeToFile(globals, "profile", false);
+    globals.classification = saveClassification().toString();
+    widget.fileHandler.writeToFile(globals.classification, "classifications", true);
+    widget.fileHandler.readFromFile("classifications").then((value) {
+      setState(() {
+          print("$value what was read");
+          print("${globals.classification} checking what was written");
+        });
+      });
     /*setState(() {
       image = Image.file(rawImage);
     });*/
@@ -211,7 +212,7 @@ class _TakePicState extends State<TakePic> {
   }
 
   String switchExpression() {
-    var emotion = emotions[_random.nextInt(emotions.length)];
+    emotion = emotions[_random.nextInt(emotions.length)];
     switch (emotion) {
       case "feliz":
         setState(() {
@@ -242,6 +243,11 @@ class _TakePicState extends State<TakePic> {
         throw UnimplementedError('no widget for $emotion');
     }
     return emotion;
+  }
+  saveClassification () {
+    var res = jsonDecode(globals.response);
+    print('${ClassifiedImage(res['Hash'], emotion, globals.uuid, res['Name'], res['Size']).toJson()} classified image to save');
+    return ClassifiedImage(res['Hash'], emotion, globals.uuid, res['Name'], res['Size']).toJson();
   }
   @override
   Widget build(BuildContext context) {
@@ -275,7 +281,7 @@ class _TakePicState extends State<TakePic> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
-                  child: Image(image: image.image, width: 350, height: 300, fit: BoxFit.fill)),
+                  child: Image(image: image.image, width: 350, height: 270, fit: BoxFit.fill)),
               ),
               SizedBox(height: 10),
               ElevatedButton.icon(
@@ -398,10 +404,18 @@ class _RouteSplashState extends State<RouteSplash> {
   void initState() {
     super.initState();
     _fetchPrefs();//running initialisation code; getting prefs etc.
-    widget.fileHandler.readFromFile().then((value) {
+    widget.fileHandler.readFromFile("profile").then((value) {
           setState(() {
               globals.username = value;
               print(globals.username);
+            });
+          });
+    widget.fileHandler.readFromFile("uuid").then((value) {
+          setState(() {
+              if (value == "nothing here") {
+                globals.uuid = Uuid().v4();
+                widget.fileHandler.writeToFile(globals.uuid, "uuid", false);
+              }
             });
           });
   }

@@ -20,13 +20,15 @@ class ClassifiedImage {
   );
 
   ClassifiedImage.fromJson(Map<String, dynamic> json) {
-    cid = json['cid'];
-    emotion = json['emotion'];
-    sourceUuid = json['sourceUuid'];
-    name = json['Name'];
-    size = json['Size'];
-    
+    cid = json['cid'] ?? "";
+    name = json['Name'] ?? "";
+    size = json['Size'] ?? "";
   }
+
+    ClassifiedImage.complete(String emotion, String uuid) {
+      emotion = emotion;
+      sourceUuid = uuid;
+    }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -34,12 +36,13 @@ class ClassifiedImage {
     data['emotion'] = emotion;
     data['sourceUuid'] = sourceUuid;
     data['name'] = name;
+    data['size'] = size;
     
     return data;
   } 
 
   List<ClassifiedImage> parseResponse(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+  final parsed = jsonDecode(responseBody).cast<String, dynamic>();
 
   return parsed.map<ClassifiedImage>((json) => ClassifiedImage.fromJson(json)).toList();
   }

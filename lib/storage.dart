@@ -1,5 +1,4 @@
 library file_storage;
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -12,20 +11,23 @@ class FileStorage {
 
 Future<File> localFile(name) async {
   final path = await _localPath;
-  print('$path get local file');
   return File('$path/$name');
 }
 
 Future<File> writeToFile(String data, String name, bool append) async {
   final file = await localFile(name);
-  print('${file.path}write to file');
 
   // Write the file
+  try {
   if (append) {
-    return file.writeAsString(data, mode: FileMode.append, flush: true, encoding: Encoding.getByName("UTF-8"));
+    return file.writeAsString(data, mode: FileMode.append, flush: true);
   } else {
     return file.writeAsString(data);
   }
+  } catch (e) {
+    print('$e this is the error');
+  }
+  return file.writeAsString("there was an error");
 }
 
 void saveFile(File file, name) async {
