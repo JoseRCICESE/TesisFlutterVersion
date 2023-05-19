@@ -1,5 +1,6 @@
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
+import 'package:TRHEAD/web3.utils.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:web3dart/crypto.dart';
 import 'dart:math';
 
 import 'globals.dart' as globals;
@@ -197,12 +199,19 @@ class _TakePicState extends State<TakePic> {
     }
     if (file == null) return;
     await ipfsUpload(file.path);
-    globals.classification = saveClassification().toString();
+    var classification = saveClassification();
+    Web3Utils web3 = Web3Utils();
+    web3.initializer("https://sepolia.infura.io/v3/bc8ddf6e870a4608925b254da90eb590");
+    web3.addRecord([classification['cid'], classification['emotion'], classification['sourceUuid'], classification['name'], classification['size']])
+    .then((value) {
+      setState(() {
+        print(value);
+        });
+      });
+    globals.classification = classification.toString();
     widget.fileHandler.writeToFile(globals.classification, "classifications", true);
     widget.fileHandler.readFromFile("classifications").then((value) {
       setState(() {
-          print("$value what was read");
-          print("${globals.classification} checking what was written");
         });
       });
     /*setState(() {
@@ -246,7 +255,6 @@ class _TakePicState extends State<TakePic> {
   }
   saveClassification () {
     var res = jsonDecode(globals.response);
-    print('${ClassifiedImage(res['Hash'], emotion, globals.uuid, res['Name'], res['Size']).toJson()} classified image to save');
     return ClassifiedImage(res['Hash'], emotion, globals.uuid, res['Name'], res['Size']).toJson();
   }
   @override
@@ -407,15 +415,6 @@ class _RouteSplashState extends State<RouteSplash> {
     widget.fileHandler.readFromFile("profile").then((value) {
           setState(() {
               globals.username = value;
-              print(globals.username);
-            });
-          });
-    widget.fileHandler.readFromFile("uuid").then((value) {
-          setState(() {
-              if (value == "nothing here") {
-                globals.uuid = Uuid().v4();
-                widget.fileHandler.writeToFile(globals.uuid, "uuid", false);
-              }
             });
           });
   }
@@ -427,6 +426,16 @@ class _RouteSplashState extends State<RouteSplash> {
         child: shouldProceed
             ? ElevatedButton(
                 onPressed: () {
+                  widget.fileHandler.readFromFile("uuid").then((value) {
+                    setState(() {
+                        if (value == "nothing here") {
+                          globals.uuid = Uuid().v4();
+                          widget.fileHandler.writeToFile(globals.uuid, "uuid", false);
+                        } else {
+                          globals.uuid = value;
+                        }
+                      });
+                    });
                   //move to next screen and pass the prefs if you want
                   Navigator.push(
                     context,
