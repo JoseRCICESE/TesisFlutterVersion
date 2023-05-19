@@ -20,7 +20,7 @@ class Web3Utils {
   Future<DeployedContract> getContract() async {
   // abi.json is the contract metadata, you can download it from the remix IDE
   String abi = await rootBundle.loadString("assets/web3/abi.json");
-  String contractAddress = "0xa5921257d1314dd7695915063ac82785daf29c3d"; // e.g. 0xd66C81d9b781152e2D9be07Ccdf2303A77B7163c
+  String contractAddress = "0x33b8e500633d7b886cc3962c08333a57e954070e"; // e.g. 0xd66C81d9b781152e2D9be07Ccdf2303A77B7163c
   String contractName = "ClassifiedData"; // you must set your own contract name here
 
   DeployedContract contract = DeployedContract(

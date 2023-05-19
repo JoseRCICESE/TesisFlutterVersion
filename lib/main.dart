@@ -208,12 +208,12 @@ class _TakePicState extends State<TakePic> {
         print(value);
         });
       });
-      web3.support([globals.uuid, 'QmTWDt9pYaAjLv8NDHum7gVCKUVzmDGehKnRSTEocfXdQT'])
+      /*web3.support([globals.uuid, 'QmTWDt9pYaAjLv8NDHum7gVCKUVzmDGehKnRSTEocfXdQT'])
       .then((value) {
         setState(() {
           print(value);
           });
-        });
+        });*/
     globals.classification = classification.toString();
     widget.fileHandler.writeToFile(globals.classification, "classifications", true);
     widget.fileHandler.readFromFile("classifications").then((value) {
