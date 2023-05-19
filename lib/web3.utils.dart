@@ -7,9 +7,14 @@ class Web3Utils {
   late Web3Client ethereumClient;
 
 
-  void initializer(ethereumClientUrl) {
-    Client httpClient = Client();
-    ethereumClient = Web3Client(ethereumClientUrl, httpClient);
+  String initializer(ethereumClientUrl) {
+    try {
+      Client httpClient = Client();
+      ethereumClient = Web3Client(ethereumClientUrl, httpClient);
+      return 'success';
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   Future<DeployedContract> getContract() async {
@@ -41,20 +46,36 @@ class Web3Utils {
     result.add(e);
     return result;
   }
-  
   }
 
-  Future<List<dynamic>> addRecord(List<dynamic> args) async {
+  Future<String> transaction(String functionName, List<dynamic> args) async {
+    EthPrivateKey credential = EthPrivateKey.fromHex('1ea2623ebc03dbe22ad83a2caa8b54dc7b1100d1c87ab823786b7eda1734ef21');
+    DeployedContract contract = await getContract();
+    ContractFunction function = contract.function(functionName);
+    dynamic result = await ethereumClient.sendTransaction(
+      credential,
+      Transaction.callContract(
+        contract: contract,
+        function: function,
+        parameters: args,
+      ),
+      fetchChainIdFromNetworkId: true,
+      chainId: null,
+    );
+
+    return result;
+  }
+
+  Future<dynamic> addRecord(List<dynamic> args) async {
     try {
-      List<dynamic> result = await query('addRecord', args);
+      dynamic result = await transaction('addRecord', args);
       return result[0];
     } catch (e) {
       print('$e this is the error in add record');
-      List<dynamic> result = [];
+      dynamic result = [];
       result.add(e);
       return result;
     }
-    
   }
 
   Future<String> getRecords() async {
@@ -62,9 +83,9 @@ class Web3Utils {
     return result[0].toString();
   }
 
-  Future<String> support(List<dynamic> args) async {
-    List<dynamic> result = await query('support', args);
-    return result[0].toString();
+  dynamic support(List<dynamic> args) async {
+    dynamic result = await transaction('support', args);
+    return result[0];
   }
 
   Future<String> oppose(List<dynamic> args) async {

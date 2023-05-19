@@ -201,13 +201,19 @@ class _TakePicState extends State<TakePic> {
     await ipfsUpload(file.path);
     var classification = saveClassification();
     Web3Utils web3 = Web3Utils();
-    web3.initializer("https://sepolia.infura.io/v3/bc8ddf6e870a4608925b254da90eb590");
+    print(web3.initializer("https://sepolia.infura.io/v3/bc8ddf6e870a4608925b254da90eb590"));
     web3.addRecord([classification['cid'], classification['emotion'], classification['sourceUuid'], classification['name'], classification['size']])
     .then((value) {
       setState(() {
         print(value);
         });
       });
+      web3.support([globals.uuid, 'QmTWDt9pYaAjLv8NDHum7gVCKUVzmDGehKnRSTEocfXdQT'])
+      .then((value) {
+        setState(() {
+          print(value);
+          });
+        });
     globals.classification = classification.toString();
     widget.fileHandler.writeToFile(globals.classification, "classifications", true);
     widget.fileHandler.readFromFile("classifications").then((value) {
