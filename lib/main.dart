@@ -1,6 +1,8 @@
+import 'package:TRHEAD/carousel.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
 import 'package:TRHEAD/web3.utils.dart';
+import 'package:TRHEAD/carousel.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +11,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:web3dart/crypto.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
 
 import 'globals.dart' as globals;
 //import 'classified_image.dart' as classified_image;
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
@@ -64,6 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
         case 1:
           page = TakePic(fileHandler: FileStorage());
           break;
+        case 2:
+          page = Carousel();
+          break;
         default:
           throw UnimplementedError('no widget for $selectedIndex');
         }
@@ -83,6 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     NavigationRailDestination(
                       icon: Icon(Icons.camera_alt),
                       label: Text('Selfies'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.check_circle),
+                      label: Text('Validación'),
                     ),
                   ],
                   selectedIndex: selectedIndex,
@@ -201,7 +211,6 @@ class _TakePicState extends State<TakePic> {
     await ipfsUpload(file.path);
     var classification = saveClassification();
     Web3Utils web3 = Web3Utils();
-    print(web3.initializer("https://sepolia.infura.io/v3/bc8ddf6e870a4608925b254da90eb590"));
     web3.addRecord([classification['cid'], classification['emotion'], classification['sourceUuid'], classification['name'], classification['size']])
     .then((value) {
       setState(() {
@@ -355,10 +364,10 @@ class BigCard extends StatelessWidget {
 }
 
 Future<void> ipfsUpload(String filePath) async {
-  var infuraProjectId = '2KiK6S75slDQfxRFU5dfP7z7TQG';
-  var infuraProjectSecret = '622237ae0de6536fe6464071ffa0a100';
+  var infuraProjectId = dotenv.env['INFURA_PROJECT_ID'] as String;
+  var infuraProjectSecret = dotenv.env['INFURA_PROJECT_SECRET'] as String;
 
-  var apiUrl = Uri.parse('https://ipfs.infura.io:5001/api/v0/add?pin=true');
+  var apiUrl = Uri.parse(dotenv.env['IPFS_ENDPOINT'] as String);
 
   var request = http.MultipartRequest('POST', apiUrl);
   request.headers['Authorization'] =

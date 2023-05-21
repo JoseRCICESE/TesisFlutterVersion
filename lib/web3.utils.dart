@@ -1,27 +1,18 @@
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Web3Utils {
-  late Client httpClient;
-  late Web3Client ethereumClient;
 
-
-  String initializer(ethereumClientUrl) {
-    try {
-      Client httpClient = Client();
-      ethereumClient = Web3Client(ethereumClientUrl, httpClient);
-      return 'success';
-    } catch (e) {
-      return e.toString();
-    }
-  }
+  final Client httpClient = Client();
+  final Web3Client ethereumClient = Web3Client(dotenv.env['WEB3_ENDPOINT'] as String, Client());
 
   Future<DeployedContract> getContract() async {
   // abi.json is the contract metadata, you can download it from the remix IDE
   String abi = await rootBundle.loadString("assets/web3/abi.json");
-  String contractAddress = "0x33b8e500633d7b886cc3962c08333a57e954070e"; // e.g. 0xd66C81d9b781152e2D9be07Ccdf2303A77B7163c
-  String contractName = "ClassifiedData"; // you must set your own contract name here
+  String contractAddress = dotenv.env['CONTRACT_ADDRESS'] as String; // e.g. 0xd66C81d9b781152e2D9be07Ccdf2303A77B7163c
+  String contractName = dotenv.env['CONTRACT_NAME'] as String; // you must set your own contract name here
 
   DeployedContract contract = DeployedContract(
     ContractAbi.fromJson(abi, contractName),
@@ -32,16 +23,13 @@ class Web3Utils {
   }
 
   Future<List<dynamic>> query(String functionName, List<dynamic> args) async {
-    print("entered query");
   DeployedContract contract = await getContract();
   ContractFunction function = contract.function(functionName);
   try {
     List<dynamic> result = await ethereumClient.call(
       contract: contract, function: function, params: args);
-      print('$result this is the result in query');
     return result;
   } catch (e) {
-    print('$e this is the error in query');
     List<dynamic> result = [];
     result.add(e);
     return result;
@@ -49,7 +37,7 @@ class Web3Utils {
   }
 
   Future<String> transaction(String functionName, List<dynamic> args) async {
-    EthPrivateKey credential = EthPrivateKey.fromHex('1ea2623ebc03dbe22ad83a2caa8b54dc7b1100d1c87ab823786b7eda1734ef21');
+    EthPrivateKey credential = EthPrivateKey.fromHex(dotenv.env['WEB3_CREDENTIAL'] as String);
     DeployedContract contract = await getContract();
     ContractFunction function = contract.function(functionName);
     dynamic result = await ethereumClient.sendTransaction(
@@ -71,16 +59,15 @@ class Web3Utils {
       dynamic result = await transaction('addRecord', args);
       return result[0];
     } catch (e) {
-      print('$e this is the error in add record');
       dynamic result = [];
       result.add(e);
       return result;
     }
   }
 
-  Future<String> getRecords() async {
+  Future<List<dynamic>> getRecords() async {
     List<dynamic> result = await query('getRecords', []);
-    return result[0].toString();
+    return result[0];
   }
 
   dynamic support(List<dynamic> args) async {
