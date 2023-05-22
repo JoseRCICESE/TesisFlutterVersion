@@ -2,18 +2,16 @@ import 'package:TRHEAD/carousel.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
 import 'package:TRHEAD/web3.utils.dart';
-import 'package:TRHEAD/carousel.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
-
+import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
 //import 'classified_image.dart' as classified_image;
 

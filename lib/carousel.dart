@@ -1,6 +1,7 @@
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'globals.dart' as globals;
 
 class Carousel extends StatefulWidget {
   @override
@@ -9,6 +10,7 @@ class Carousel extends StatefulWidget {
 
 class _CarouselState extends State<Carousel> {
   List<String> imagesList = [];
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -40,6 +42,10 @@ class _CarouselState extends State<Carousel> {
                 autoPlay: false,
                 scrollDirection: Axis.horizontal,
                 enlargeCenterPage: true,
+                onPageChanged: (index, reason) {
+                    _currentIndex = index;
+                    setState((){});
+                  },
               ),
               items: imagesList
                   .map(
@@ -60,11 +66,28 @@ class _CarouselState extends State<Carousel> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
+              ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Web3Utils().oppose([globals.uuid, imagesList[_currentIndex]])
+                  .then((value) => print('$value is the result of the oppose transaction'));
+                  Web3Utils().getOpposers([imagesList[_currentIndex]]).
+                  then((value) => print('$value is the result of the getOpposers query'));
                 },
-                child: Text('Volver'),
+                label: Text('No válida'),
+                icon: Icon( Icons.thumb_down),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Web3Utils().support([globals.uuid, imagesList[_currentIndex]])
+                  .then((value) => print('$value is the result of the support transaction'));
+                  Web3Utils().getSupporters([imagesList[_currentIndex]]).
+                  then((value) => print('$value is the result of the getSupporters query'));
+                },
+                label: Text('Válida'),
+                icon: Icon( Icons.thumb_up),
               ),
             ],
           ),

@@ -51,7 +51,7 @@ class Web3Utils {
       chainId: null,
     );
 
-    return result;
+    return result[0];
   }
 
   Future<dynamic> addRecord(List<dynamic> args) async {
@@ -76,17 +76,17 @@ class Web3Utils {
   }
 
   Future<String> oppose(List<dynamic> args) async {
-    List<dynamic> result = await query('oppose', args);
+    dynamic result = await transaction('oppose', args);
     return result[0].toString();
   }
 
   Future<String> getOpposers(List<dynamic> args) async {
-    List<dynamic> result = await query('addRecord', args);
+    List<dynamic> result = await query('getSupporters', args);
     return result[0].toString();
   }
 
   Future<String> getSupporters(List<dynamic> args) async {
-    List<dynamic> result = await query('addRecord', args);
+    List<dynamic> result = await query('getOpposers', args);
     return result[0].toString();
   }
 }
