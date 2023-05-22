@@ -1,4 +1,5 @@
 import 'package:TRHEAD/web3.utils.dart';
+import 'package:TRHEAD/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'globals.dart' as globals;
@@ -11,6 +12,8 @@ class Carousel extends StatefulWidget {
 class _CarouselState extends State<Carousel> {
   List<String> imagesList = [];
   int _currentIndex = 0;
+  bool _isImageValidated = false;
+  List<String> _alreadyChecked = [];
 
   @override
   void initState() {
@@ -20,6 +23,12 @@ class _CarouselState extends State<Carousel> {
         imagesList = value.map((e) => e[0].toString()).toList();
 
         print(imagesList);
+      });
+    });
+    FileStorage().readFromFile("viewed").then((value) {
+      setState(() {
+        _alreadyChecked = value.split("\n").map((e) => e[0].toString()).toList();
+        print(_alreadyChecked);
       });
     });
     super.initState();
@@ -44,7 +53,11 @@ class _CarouselState extends State<Carousel> {
                 enlargeCenterPage: true,
                 onPageChanged: (index, reason) {
                     _currentIndex = index;
-                    setState((){});
+                    if (_alreadyChecked.contains(imagesList[_currentIndex])) {
+                      setState((){_isImageValidated = true;});
+                    } else {
+                      setState((){_isImageValidated = false;});
+                    }
                   },
               ),
               items: imagesList
@@ -67,12 +80,17 @@ class _CarouselState extends State<Carousel> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton.icon(
-                onPressed: () {
+                onPressed: !_isImageValidated ? () {
                   Web3Utils().oppose([globals.uuid, imagesList[_currentIndex]])
                   .then((value) => print('$value is the result of the oppose transaction'));
+                  FileStorage().writeToFile(imagesList[_currentIndex], "viewed", true);
+                  setState(() {
+                    _alreadyChecked.add(imagesList[_currentIndex]);
+                    _isImageValidated = true;
+                  });
                   Web3Utils().getOpposers([imagesList[_currentIndex]]).
                   then((value) => print('$value is the result of the getOpposers query'));
-                },
+                } : null,
                 label: Text('No válida'),
                 icon: Icon( Icons.thumb_down),
               ),
@@ -80,12 +98,17 @@ class _CarouselState extends State<Carousel> {
                 width: 20,
               ),
               ElevatedButton.icon(
-                onPressed: () {
+                onPressed: !_isImageValidated ? () {
                   Web3Utils().support([globals.uuid, imagesList[_currentIndex]])
                   .then((value) => print('$value is the result of the support transaction'));
+                  FileStorage().writeToFile(imagesList[_currentIndex], "viewed", true);
+                  setState(() {
+                    _alreadyChecked.add(imagesList[_currentIndex]);
+                    _isImageValidated = true;
+                  });
                   Web3Utils().getSupporters([imagesList[_currentIndex]]).
                   then((value) => print('$value is the result of the getSupporters query'));
-                },
+                } : null,
                 label: Text('Válida'),
                 icon: Icon( Icons.thumb_up),
               ),
@@ -96,3 +119,4 @@ class _CarouselState extends State<Carousel> {
     );
   }
 }
+
