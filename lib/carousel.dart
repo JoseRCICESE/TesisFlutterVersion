@@ -21,15 +21,25 @@ class _CarouselState extends State<Carousel> {
       setState(() {
         print("${value[0]} is in the state of carousel");
         imagesList = value.map((e) => e[0].toString()).toList();
+        print('$imagesList is the list of images to be checked');
 
-        print(imagesList);
+        FileStorage().readFromFile("viewed").then((value) {
+          setState(() {
+          print('$value is the value of the viewed file');
+          if (value != "nothing here") {
+            _alreadyChecked = value.split(" ").map((e) => e.toString()).toList();
+            print('$_alreadyChecked is the list of images already checked');
+            for (var i = 0; i < _alreadyChecked.length; i++) {
+              imagesList.remove(_alreadyChecked[i]);
+            }
+          print('$imagesList is the list of images to be checked after removing the already checked ones');
+            }
+          });
+        });
       });
     });
-    FileStorage().readFromFile("viewed").then((value) {
-      setState(() {
-        _alreadyChecked = value.split("\n").map((e) => e[0].toString()).toList();
-        print(_alreadyChecked);
-      });
+    setState(() {
+      print(imagesList);
     });
     super.initState();
   }
@@ -48,6 +58,7 @@ class _CarouselState extends State<Carousel> {
             padding: const EdgeInsets.all(8.0),
             child: CarouselSlider(
               options: CarouselOptions(
+                enableInfiniteScroll: true,
                 autoPlay: false,
                 scrollDirection: Axis.horizontal,
                 enlargeCenterPage: true,
@@ -81,9 +92,10 @@ class _CarouselState extends State<Carousel> {
             children: [
               ElevatedButton.icon(
                 onPressed: !_isImageValidated ? () {
+                  print('${imagesList[_currentIndex]} is the actual image');
                   Web3Utils().oppose([globals.uuid, imagesList[_currentIndex]])
                   .then((value) => print('$value is the result of the oppose transaction'));
-                  FileStorage().writeToFile(imagesList[_currentIndex], "viewed", true);
+                  FileStorage().writeToFile('${imagesList[_currentIndex]} ', "viewed", true);
                   setState(() {
                     _alreadyChecked.add(imagesList[_currentIndex]);
                     _isImageValidated = true;
@@ -101,7 +113,7 @@ class _CarouselState extends State<Carousel> {
                 onPressed: !_isImageValidated ? () {
                   Web3Utils().support([globals.uuid, imagesList[_currentIndex]])
                   .then((value) => print('$value is the result of the support transaction'));
-                  FileStorage().writeToFile(imagesList[_currentIndex], "viewed", true);
+                  FileStorage().writeToFile('${imagesList[_currentIndex]} ', "viewed", true);
                   setState(() {
                     _alreadyChecked.add(imagesList[_currentIndex]);
                     _isImageValidated = true;
