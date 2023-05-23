@@ -13,7 +13,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
-//import 'classified_image.dart' as classified_image;
 
 void main() async {
   await dotenv.load(fileName: ".env");
