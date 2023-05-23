@@ -2,7 +2,7 @@ import 'package:TRHEAD/carousel.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
 import 'package:TRHEAD/web3.utils.dart';
-import 'package:english_words/english_words.dart';
+import 'package:TRHEAD/personalized_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -129,42 +129,46 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Entonces te llamas:"),
-          Container(
-            margin: EdgeInsets.all(25),
-            child: TextFormField(
-              initialValue: username,
-              onChanged: (value) {
-                setState(() {
-                  username = value;
-                });
-              },
-              decoration: const InputDecoration(
-                icon: Icon(Icons.person),
-                hintText: 'Introduce tu nombre',
-                labelText: 'Nombre',
+    return Container(
+      margin: EdgeInsets.all(25),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(text: "Entonces te llamas:"),
+            Container(
+              margin: EdgeInsets.all(25),
+              width: 400,
+              child: TextFormField(
+                initialValue: username,
+                onChanged: (value) {
+                  setState(() {
+                    username = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.person),
+                  hintText: 'Introduce tu nombre',
+                  labelText: 'Nombre',
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  widget.fileHandler.writeToFile(username, "profile", false);
-                  globals.username = username;
-                },
-                icon: Icon( Icons.check_circle),
-                label: Text('Correcto'),
-              ),
-            ],
-          ),
-        ],
+            SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    widget.fileHandler.writeToFile(username, "profile", false);
+                    globals.username = username;
+                  },
+                  icon: Icon( Icons.check_circle),
+                  label: Text('Correcto'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -215,22 +219,12 @@ class _TakePicState extends State<TakePic> {
         print(value);
         });
       });
-      /*web3.support([globals.uuid, 'QmTWDt9pYaAjLv8NDHum7gVCKUVzmDGehKnRSTEocfXdQT'])
-      .then((value) {
-        setState(() {
-          print(value);
-          });
-        });*/
     globals.classification = classification.toString();
     widget.fileHandler.writeToFile(globals.classification, "classifications", true);
     widget.fileHandler.readFromFile("classifications").then((value) {
       setState(() {
         });
       });
-    /*setState(() {
-      image = Image.file(rawImage);
-    });*/
-
   }
 
   String switchExpression() {
@@ -276,20 +270,20 @@ class _TakePicState extends State<TakePic> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-//hero goes the placeholder for the picture
           SizedBox(height: 10),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 margin: EdgeInsets.all(20),
-                child: TextField(
+                child: BigCard(text: 'Fred está ${switchExpression()}, intenta imitarlo.'),
+                /*TextField(
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Fred está ${switchExpression()}...\n...intenta imitarlo \n ${globals.response}',
                   ),
-                ),
+                ),*/
               ),
               Container(
                 margin: EdgeInsets.all(15),
@@ -331,35 +325,6 @@ class _TakePicState extends State<TakePic> {
   }
 }
 // ...
-
-class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
-
-  final WordPair pair;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
-        ),
-      ),
-    );
-  }
-}
 
 Future<void> ipfsUpload(String filePath) async {
   var infuraProjectId = dotenv.env['INFURA_PROJECT_ID'] as String;

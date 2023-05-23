@@ -1,3 +1,4 @@
+import 'package:TRHEAD/personalized_widgets.dart';
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:flutter/material.dart';
@@ -54,10 +55,16 @@ class _CarouselState extends State<Carousel> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CarouselSlider(
+          Container(
+            margin: EdgeInsets.all(25),
+            child: BigCard(text: "¿Es esta imagen válida?")
+            ),
+          SizedBox(
+            height: 15,
+          ),
+          CarouselSlider(
               options: CarouselOptions(
+                height: 400,
                 enableInfiniteScroll: true,
                 autoPlay: false,
                 scrollDirection: Axis.horizontal,
@@ -73,17 +80,13 @@ class _CarouselState extends State<Carousel> {
               ),
               items: imagesList
                   .map(
-                    (item) => Center(
-                      child: Image.network(
+                    (item) => Image.network(
                         "https://tesis.infura-ipfs.io/ipfs/$item",
-                        fit: BoxFit.cover,
-                        width: 250,
+                        fit: BoxFit.fill,
                       ),
-                    ),
                   )
                   .toList(),
             ),
-          ),
           SizedBox(
             height: 20,
           ),
