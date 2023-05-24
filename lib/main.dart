@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
@@ -276,13 +275,6 @@ class _TakePicState extends State<TakePic> {
               Container(
                 margin: EdgeInsets.all(20),
                 child: BigCard(text: 'Fred está ${switchExpression()}, intenta imitarlo.'),
-                /*TextField(
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Fred está ${switchExpression()}...\n...intenta imitarlo \n ${globals.response}',
-                  ),
-                ),*/
               ),
               Container(
                 margin: EdgeInsets.all(15),
@@ -349,25 +341,6 @@ Future<void> ipfsUpload(String filePath) async {
   }
 }
 
-void savePair(List<List<String>> content) async {
-  final writer = await SharedPreferences.getInstance();
-  for (var i = 0; i < content.length; i++) {
-    await writer.setString(content[i][0], content[i][1]);
-  }
-  final checking = writer.getString('uuid');
-  print(checking);
-}
-
-void readPair(key) async {
-  try {
-  final reader = await SharedPreferences.getInstance();
-  globals.username = reader.getString('username') as String;
-  print(reader.getString('uuid'));
-  } catch (e) {
-    print(e);
-  }
-}
-
 class RouteSplash extends StatefulWidget {
     const RouteSplash({super.key, required this.fileHandler});
     final FileStorage fileHandler;
@@ -399,29 +372,57 @@ class _RouteSplashState extends State<RouteSplash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: shouldProceed
-            ? ElevatedButton(
-                onPressed: () {
-                  widget.fileHandler.readFromFile("uuid").then((value) {
-                    setState(() {
-                        if (value == "nothing here") {
-                          globals.uuid = Uuid().v4();
-                          widget.fileHandler.writeToFile(globals.uuid, "uuid", false);
-                        } else {
-                          globals.uuid = value;
-                        }
-                      });
-                    });
-                  //move to next screen and pass the prefs if you want
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MyHomePage(fileHandler: FileStorage(),)),
-                  );
-                },
-                child: Text("Continue"),
-              )
-            : CircularProgressIndicator(),//show splash screen here instead of progress indicator
+      body: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.all(30),
+            child: BigCard(text: "Bienvenido a TRHEAD")),
+          Container(
+            margin: EdgeInsets.all(30),
+            decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 5,
+                    color: Colors.green,
+                  ),
+                  borderRadius: BorderRadius.circular(20), 
+                ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "A continuación se espera que introduzca su nombre para poder identificarlo en la red.\nAl presionar el ícono de cámara en la barra lateral, se le pedirá que tome una foto de su rostro para imitar al robot FRED.\nPresionar el ícono de checkmark le permitirá clasificar imágenes subidas por otros usuarios en base a su validez para entrenar un modelo de aprendizaje de máquinas para la detección de emociones.",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ),
+          ),
+          Center(
+            child: shouldProceed
+                ? ElevatedButton(
+                    onPressed: () {
+                      widget.fileHandler.readFromFile("uuid").then((value) {
+                        setState(() {
+                            if (value == "nothing here") {
+                              globals.uuid = Uuid().v4();
+                              widget.fileHandler.writeToFile(globals.uuid, "uuid", false);
+                            } else {
+                              globals.uuid = value;
+                            }
+                          });
+                        });
+                      //move to next screen and pass the prefs if you want
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyHomePage(fileHandler: FileStorage(),)),
+                      );
+                    },
+                    child: Text("Empecemos"),
+                  )
+                : CircularProgressIndicator(),//show splash screen here instead of progress indicator
+          ),
+        ],
       ),
     );
   }
