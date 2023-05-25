@@ -181,7 +181,7 @@ class TakePic extends StatefulWidget {
 }
 
 class _TakePicState extends State<TakePic> {
-  var image = Image.asset('assets/base_avatar.jpg');
+  var image = Image.asset('assets/fred_expressions/neutral.png');
   var happy = Image.asset('assets/fred_expressions/happy.png');
   var sad = Image.asset('assets/fred_expressions/sad.png');
   var angry = Image.asset('assets/fred_expressions/angry.png');
@@ -190,7 +190,7 @@ class _TakePicState extends State<TakePic> {
 
   List<String> emotions = ["feliz", "triste", "enojado", "sorprendido", "neutral"];
   final _random = Random();
-  String emotion = "";
+  String emotion = "neutral";
   var response = {};
 
   Future<void> imageUpload(source) async {
@@ -211,10 +211,14 @@ class _TakePicState extends State<TakePic> {
     await ipfsUpload(file.path);
     var classification = saveClassification();
     Web3Utils web3 = Web3Utils();
+    const snackBar = SnackBar(
+      content: Text('Imagen subida correctamente'),
+    );
     web3.addRecord([classification['cid'], classification['emotion'], classification['sourceUuid'], classification['name'], classification['size']])
     .then((value) {
       setState(() {
         print(value);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         });
       });
     globals.classification = classification.toString();
@@ -274,7 +278,7 @@ class _TakePicState extends State<TakePic> {
             children: [
               Container(
                 margin: EdgeInsets.all(20),
-                child: BigCard(text: 'Fred está ${switchExpression()}, intenta imitarlo.'),
+                child: BigCard(text: 'Fred está $emotion, intenta imitarlo.'),
               ),
               Container(
                 margin: EdgeInsets.all(15),
