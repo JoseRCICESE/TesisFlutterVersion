@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:TRHEAD/carousel.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:TRHEAD/personalized_widgets.dart';
-import 'package:TRHEAD/pdf_view.dart';
+//import 'package:TRHEAD/pdf_view.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -417,24 +420,24 @@ class _RouteSplashState extends State<RouteSplash> {
                   borderRadius: BorderRadius.circular(20), 
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text("Continuar implica que está de acuerdo con los términos y condiciones de uso de la aplicación que puede consultar aquí:",
+                  padding: EdgeInsets.all(5),
+                  child: 
+                    TextButton(
+                  child: Text("Continuar implica que acepta firmar la carta de consentimiento que puede consultar presionando aquí",
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
                   ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PdfViewer()),
+                      );
+                    }
                   )
                   ),
-              ),
-              IconButton(
-                icon: Icon(Icons.info),
-                onPressed: () => {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PdfViewer()),
-                  ),
-                },
               ),
             ]       
           ),
@@ -464,6 +467,65 @@ class _RouteSplashState extends State<RouteSplash> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class PdfViewer extends StatelessWidget {
+  const PdfViewer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Carta de consentimiento',
+      theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 23, 245, 89)),
+        ),
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Carta  de consentimiento para uso de datos')),
+        body: const MyStatefulWidget(),
+      ),
+    );
+  }
+}
+
+class MyStatefulWidget extends StatefulWidget {
+  const MyStatefulWidget({super.key});
+
+  @override
+  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+}
+
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  final pdfController = PdfController(
+    document: PdfDocument.openAsset("assets/CartaDeConsentimiento_TRHEAD.pdf"),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 600,
+          margin: EdgeInsets.all(10),
+          child: PdfView(
+          controller: pdfController,
+          ),
+        ),
+        FloatingActionButton(
+          onPressed: () {
+            //MaterialPageRoute(builder: (context) => MyHomePage(fileHandler: FileStorage(),)),
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RouteSplash(fileHandler: FileStorage(),)),
+            );
+            //Navigator.pop(context);
+          },
+          backgroundColor: Colors.green,
+          child: const Icon(Icons.arrow_back),
+        ),
+      ]
     );
   }
 }
