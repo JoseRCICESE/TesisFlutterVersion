@@ -3,6 +3,7 @@ import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:TRHEAD/personalized_widgets.dart';
+import 'package:TRHEAD/pdf_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -378,11 +379,12 @@ class _RouteSplashState extends State<RouteSplash> {
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(height: 15),
           Container(
-            margin: EdgeInsets.all(30),
+            margin: EdgeInsets.all(15),
             child: BigCard(text: "Bienvenido a TRHEAD")),
           Container(
-            margin: EdgeInsets.all(30),
+            margin: EdgeInsets.all(15),
             decoration: BoxDecoration(
                   border: Border.all(
                     width: 5,
@@ -401,6 +403,40 @@ class _RouteSplashState extends State<RouteSplash> {
                 ),
               ),
             ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 5,
+                    color: Colors.green,
+                  ),
+                  borderRadius: BorderRadius.circular(20), 
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text("Continuar implica que está de acuerdo con los términos y condiciones de uso de la aplicación que puede consultar aquí:",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                  )
+                  ),
+              ),
+              IconButton(
+                icon: Icon(Icons.info),
+                onPressed: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PdfViewer()),
+                  ),
+                },
+              ),
+            ]       
           ),
           Center(
             child: shouldProceed

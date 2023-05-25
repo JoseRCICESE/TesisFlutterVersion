@@ -1,4 +1,9 @@
 # This is a generated file; do not edit or check into version control.
+device_info_plus=/home/ember/.pub-cache/hosted/pub.dev/device_info_plus-4.1.3/
+device_info_plus_linux=/home/ember/.pub-cache/hosted/pub.dev/device_info_plus_linux-3.0.0/
+device_info_plus_macos=/home/ember/.pub-cache/hosted/pub.dev/device_info_plus_macos-3.0.0/
+device_info_plus_web=/home/ember/.pub-cache/hosted/pub.dev/device_info_plus_web-3.0.0/
+device_info_plus_windows=/home/ember/.pub-cache/hosted/pub.dev/device_info_plus_windows-4.1.0/
 flutter_plugin_android_lifecycle=/home/ember/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.14/
 image_picker=/home/ember/.pub-cache/hosted/pub.dev/image_picker-0.8.7+5/
 image_picker_android=/home/ember/.pub-cache/hosted/pub.dev/image_picker_android-0.8.6+13/
@@ -9,6 +14,7 @@ path_provider_android=/home/ember/.pub-cache/hosted/pub.dev/path_provider_androi
 path_provider_foundation=/home/ember/.pub-cache/hosted/pub.dev/path_provider_foundation-2.2.3/
 path_provider_linux=/home/ember/.pub-cache/hosted/pub.dev/path_provider_linux-2.1.10/
 path_provider_windows=/home/ember/.pub-cache/hosted/pub.dev/path_provider_windows-2.1.6/
+pdfx=/home/ember/.pub-cache/hosted/pub.dev/pdfx-2.3.0/
 shared_preferences=/home/ember/.pub-cache/hosted/pub.dev/shared_preferences-2.1.1/
 shared_preferences_android=/home/ember/.pub-cache/hosted/pub.dev/shared_preferences_android-2.1.4/
 shared_preferences_foundation=/home/ember/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.2.2/
