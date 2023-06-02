@@ -281,7 +281,7 @@ class _TakePicState extends State<TakePic> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                margin: EdgeInsets.all(20),
+                margin: EdgeInsets.all(10),
                 child: BigCard(text: 'Fred está $emotion, intenta imitarlo.'),
               ),
               Container(
@@ -400,7 +400,7 @@ class _RouteSplashState extends State<RouteSplash> {
               child: Text(
                 "A continuación se espera que introduzca su nombre para poder identificarlo en la red.\nAl presionar el ícono de cámara en la barra lateral, se le pedirá que tome una foto de su rostro para imitar al robot FRED.\nPresionar el ícono de checkmark le permitirá clasificar imágenes subidas por otros usuarios en base a su validez para entrenar un modelo de aprendizaje de máquinas para la detección de emociones.",
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: Colors.green,
                 ),
@@ -425,7 +425,7 @@ class _RouteSplashState extends State<RouteSplash> {
                     TextButton(
                   child: Text("Continuar implica que acepta firmar la carta de consentimiento que puede consultar presionando aquí",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
                   ),

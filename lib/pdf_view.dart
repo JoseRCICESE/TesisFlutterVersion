@@ -56,7 +56,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             Navigator.pop(context);
           },
           backgroundColor: Colors.green,
-          child: const Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back_ios),
         ),
       ]
     );

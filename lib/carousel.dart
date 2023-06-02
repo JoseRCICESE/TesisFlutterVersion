@@ -12,6 +12,7 @@ class Carousel extends StatefulWidget {
 
 class _CarouselState extends State<Carousel> {
   List<String> imagesList = [];
+  List<String> emotionsList = [];
   int _currentIndex = 0;
   bool _isImageValidated = false;
   List<String> _alreadyChecked = [];
@@ -22,6 +23,7 @@ class _CarouselState extends State<Carousel> {
       setState(() {
         print("${value[0]} is in the state of carousel");
         imagesList = value.map((e) => e[0].toString()).toList();
+        emotionsList = value.map((e) => e[1].toString()).toList();
         print('$imagesList is the list of images to be checked');
 
         FileStorage().readFromFile("viewed").then((value) {
