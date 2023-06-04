@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:TRHEAD/carousel.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
@@ -227,10 +225,6 @@ class _TakePicState extends State<TakePic> {
       });
     globals.classification = classification.toString();
     widget.fileHandler.writeToFile(globals.classification, "classifications", true);
-    widget.fileHandler.readFromFile("classifications").then((value) {
-      setState(() {
-        });
-      });
   }
 
   String switchExpression() {
