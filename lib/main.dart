@@ -3,6 +3,7 @@ import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:TRHEAD/personalized_widgets.dart';
+import 'package:TRHEAD/per_stats.dart';
 //import 'package:TRHEAD/pdf_view.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,9 @@ class _MyHomePageState extends State<MyHomePage> {
         case 2:
           page = Carousel();
           break;
+        case 3:
+          page = Stats();
+          break;
         default:
           throw UnimplementedError('no widget for $selectedIndex');
         }
@@ -91,6 +95,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     NavigationRailDestination(
                       icon: Icon(Icons.check_circle),
                       label: Text('Validación'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.bar_chart),
+                      label: Text('Estadísticas'),
                     ),
                   ],
                   selectedIndex: selectedIndex,
