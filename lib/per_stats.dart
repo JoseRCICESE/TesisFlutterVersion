@@ -14,14 +14,31 @@ class _StatsState extends State<Stats> {
   String uuid = "";
   String records = "";
   List<ClassifiedImage> imagesList = [];
+  List<String> empty = [];
 
   @override
   void initState() {
     Web3Utils().getRecords().then((value) {
       setState(() {
         records = value.toString();
-        imagesList = value.map((e) => ClassifiedImage(e[0].toString(), e[1].toString(), e[2].toString(), e[3].toString(), e[4].toString())).toList();
+        imagesList = value.map((e) => ClassifiedImage(e[0].toString(), e[1].toString(), e[2].toString(), e[3].toString(), e[4].toString(), empty, empty)).toList();
         print(imagesList[0].cid);
+        for (var element in imagesList) {
+          Web3Utils().getSupporters([element.cid]).then((value) {
+            setState(() {
+              print("$value is the supporters value");
+              element.supporters = value.toString().split(",");
+              print("${element.supporters} is the supporters list in the image");
+            });
+          });
+          Web3Utils().getOpposers([element.cid]).then((value) {
+            setState(() {
+              print("$value is the opposers value");
+              element.opposers = value.toString().split(",");
+              print("${element.opposers} is the opposers list in the image");
+            });
+          });
+        }
       });
     });
     FileStorage().readFromFile("uuid").then((value) {
@@ -75,8 +92,8 @@ class _StatsState extends State<Stats> {
                   itemBuilder: (BuildContext context, int index){
                   return ListTile(
                     leading: Icon(Icons.image),
-                    trailing: Text("Imagen:"),
                     title: Text(imagesList[index].name),
+                    subtitle: Text("${imagesList[index].supporters.length.toString()} a favor, ${imagesList[index].opposers.length.toString()} en contra"),
                   );
                 },
                     ),

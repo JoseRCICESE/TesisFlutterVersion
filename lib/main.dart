@@ -201,6 +201,7 @@ class _TakePicState extends State<TakePic> {
   List<String> emotions = ["feliz", "triste", "enojado", "sorprendido", "neutral"];
   final _random = Random();
   String emotion = "neutral";
+  List<String> empty = [];
   var response = {};
 
   Future<void> imageUpload(source) async {
@@ -270,7 +271,7 @@ class _TakePicState extends State<TakePic> {
   }
   saveClassification () {
     var res = jsonDecode(globals.response);
-    return ClassifiedImage(res['Hash'], emotion, globals.uuid, res['Name'], res['Size']).toJson();
+    return ClassifiedImage(res['Hash'], emotion, globals.uuid, res['Name'], res['Size'], empty, empty).toJson();
   }
   @override
   Widget build(BuildContext context) {

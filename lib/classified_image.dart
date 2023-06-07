@@ -8,6 +8,8 @@ class ClassifiedImage {
   late String sourceUuid;
   late String name;
   late String size;
+  late List<String> supporters;
+  late List<String> opposers;
   
 
   ClassifiedImage(
@@ -16,7 +18,8 @@ class ClassifiedImage {
     this.sourceUuid,
     this.name,
     this.size,
-  
+    this.supporters,
+    this.opposers,
   );
 
   ClassifiedImage.fromJson(Map<String, dynamic> json) {
@@ -45,5 +48,13 @@ class ClassifiedImage {
   final parsed = jsonDecode(responseBody).cast<String, dynamic>();
 
   return parsed.map<ClassifiedImage>((json) => ClassifiedImage.fromJson(json)).toList();
+  }
+
+  void setSupporters (List<String> supporters) {
+    supporters = supporters;
+  }
+
+  void setOpposers (List<String> opposers) {
+    opposers = opposers;
   }
 }
