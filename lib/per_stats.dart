@@ -1,7 +1,7 @@
-import 'package:TRHEAD/personalized_widgets.dart';
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
+import 'package:TRHEAD/user_stats.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -15,6 +15,9 @@ class _StatsState extends State<Stats> {
   String records = "";
   List<ClassifiedImage> imagesList = [];
   List<String> empty = [];
+  List<UserStats> users = [];
+  List<String> uuids = [];
+  bool showAllStats = true;
 
   @override
   void initState() {
@@ -22,28 +25,37 @@ class _StatsState extends State<Stats> {
       setState(() {
         records = value.toString();
         imagesList = value.map((e) => ClassifiedImage(e[0].toString(), e[1].toString(), e[2].toString(), e[3].toString(), e[4].toString(), empty, empty)).toList();
-        print(imagesList[0].cid);
         for (var element in imagesList) {
           Web3Utils().getSupporters([element.cid]).then((value) {
             setState(() {
-              print("$value is the supporters value");
               element.supporters = value.toString().split(",");
-              print("${element.supporters} is the supporters list in the image");
             });
           });
           Web3Utils().getOpposers([element.cid]).then((value) {
             setState(() {
-              print("$value is the opposers value");
               element.opposers = value.toString().split(",");
-              print("${element.opposers} is the opposers list in the image");
             });
           });
+          uuids.add(element.sourceUuid);
+        }
+        uuids = uuids.toSet().toList();
+        for (var element in uuids) {
+          users.add(UserStats(element, 0, 0));
+        }
+        for (var user in users) {
+          for (var element in imagesList) {
+              if (element.sourceUuid == user.sourceUuid) {
+                user.increaseTotalImages();
+                if (element.supporters.contains(user.sourceUuid) || element.opposers.contains(user.sourceUuid)) {
+                  user.increaseTotalClassified();
+                }
+              }
+            }
         }
       });
     });
     FileStorage().readFromFile("uuid").then((value) {
       setState(() {
-      print('$value is the uuid that was read from file');
       if (value != "nothing here") {
         uuid = value;
         }
@@ -80,23 +92,66 @@ class _StatsState extends State<Stats> {
           SizedBox(
             height: 25,
           ),
-          SingleChildScrollView(
-            child: Container(
-              margin: EdgeInsets.all(5),
-              height: 550,
-              child: ListView.separated(        // To add separation line between the ListView 
-                separatorBuilder: (context, index) => Divider(
-                  color: Colors.green,
-                ),
-                  itemCount: imagesList.length,
-                  itemBuilder: (BuildContext context, int index){
-                  return ListTile(
-                    leading: Icon(Icons.image),
-                    title: Text(imagesList[index].name),
-                    subtitle: Text("${imagesList[index].supporters.length.toString()} a favor, ${imagesList[index].opposers.length.toString()} en contra"),
-                  );
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Mostrar todas las estadísticas"),
+              Switch(
+                value: showAllStats,
+                onChanged: (value) {
+                  setState(() {
+                    showAllStats = value;
+                  });
                 },
-                    ),
+                activeTrackColor: Colors.lightGreenAccent,
+                activeColor: Colors.green,
+              ),
+            ],
+          ),
+
+          Visibility(
+            visible: !showAllStats,
+            child: SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.all(5),
+                height: 550,
+                child: ListView.separated(        // To add separation line between the ListView 
+                  separatorBuilder: (context, index) => Divider(
+                    color: Colors.green,
+                  ),
+                    itemCount: users.length,
+                    itemBuilder: (BuildContext context, int index){
+                    return ListTile(
+                      leading: Icon(Icons.person),
+                      title: Text(users[index].sourceUuid),
+                      subtitle: Text("Ha subido ${users[index].totalImages.toString()} y ha clasificado ${users[index].totalClassified.toString()} imágenes"),
+                    );
+                  },
+                      ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible: showAllStats,
+            child: SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.all(5),
+                height: 550,
+                child: ListView.separated(        // To add separation line between the ListView 
+                  separatorBuilder: (context, index) => Divider(
+                    color: Colors.green,
+                  ),
+                    itemCount: imagesList.length,
+                    itemBuilder: (BuildContext context, int index){
+                    return ListTile(
+                      leading: Icon(Icons.image),
+                      title: Text(imagesList[index].name),
+                      subtitle: Text("${imagesList[index].supporters.length.toString()} a favor, ${imagesList[index].opposers.length.toString()} en contra"),
+                    );
+                  },
+                      ),
+              ),
             ),
           ),
         ],
