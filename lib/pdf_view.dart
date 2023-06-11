@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
-import 'package:TRHEAD/main.dart';
 
 void main() => runApp(const PdfViewer());
 
