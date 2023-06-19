@@ -81,12 +81,12 @@ class Web3Utils {
   }
 
   Future<String> getOpposers(List<dynamic> args) async {
-    List<dynamic> result = await query('getSupporters', args);
+    List<dynamic> result = await query('getOpposers', args);
     return result[0].toString();
   }
 
   Future<String> getSupporters(List<dynamic> args) async {
-    List<dynamic> result = await query('getOpposers', args);
+    List<dynamic> result = await query('getSupporters', args);
     return result[0].toString();
   }
 }

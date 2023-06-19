@@ -1,4 +1,3 @@
-import 'package:TRHEAD/personalized_widgets.dart';
 import 'package:TRHEAD/web3.utils.dart';
 import 'package:TRHEAD/storage.dart';
 import 'package:TRHEAD/classified_image.dart';
