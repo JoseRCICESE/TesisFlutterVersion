@@ -75,9 +75,9 @@ class Web3Utils {
     return result[0];
   }
 
-  Future<String> oppose(List<dynamic> args) async {
+  dynamic oppose(List<dynamic> args) async {
     dynamic result = await transaction('oppose', args);
-    return result[0].toString();
+    return result[0];
   }
 
   Future<String> getOpposers(List<dynamic> args) async {
